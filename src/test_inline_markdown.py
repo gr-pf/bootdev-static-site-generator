@@ -1,6 +1,10 @@
 import unittest
 
-from inline_markdown import split_nodes_delimiter
+from inline_markdown import (
+    split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
+)
 from textnode import TextType, TextNode
 
 
@@ -46,3 +50,37 @@ class TestSplitNode(unittest.TestCase):
             node2,
         ]
         self.assertEqual(result, expected)
+
+    def test_extract_markdown_images(self):
+        result = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        expected = [("image", "https://i.imgur.com/zjjcJKZ.png")]
+        self.assertListEqual(result, expected)
+
+    def test_extract_markdown_images_multiples(self):
+        result = extract_markdown_images(
+            "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        )
+        expected = [
+            ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+            ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
+        ]
+        self.assertListEqual(result, expected)
+
+    def test_extract_markdown_links(self):
+        result = extract_markdown_links(
+            "This is text with an [link](https://www.dummy.com)"
+        )
+        expected = [("link", "https://www.dummy.com")]
+        self.assertListEqual(result, expected)
+
+    def test_extract_markdown_links_multiples(self):
+        result = extract_markdown_links(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        )
+        expected = [
+            ("to boot dev", "https://www.boot.dev"),
+            ("to youtube", "https://www.youtube.com/@bootdotdev"),
+        ]
+        self.assertListEqual(result, expected)
