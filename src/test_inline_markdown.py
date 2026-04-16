@@ -11,7 +11,7 @@ from inline_markdown import (
 from textnode import TextType, TextNode
 
 
-class TestSplitNode(unittest.TestCase):
+class TestInlineMarkdown(unittest.TestCase):
     def test_split_nodes_code(self):
         node = TextNode("This is text with a `code block` word", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
