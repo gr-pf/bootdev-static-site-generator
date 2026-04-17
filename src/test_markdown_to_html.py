@@ -11,7 +11,6 @@ from markdown_to_html import (
     paragraph_to_html,
     markdown_to_html_node,
 )
-from htmlnode import ParentNode, LeafNode
 
 
 class TestMarkdownToHtml(unittest.TestCase):
@@ -70,13 +69,10 @@ the **same** even with inline stuff
 
     def test_block_to_html_node_quote(self):
         block_type = BlockType.QUOTE
-        block = """
-> Dorothy followed her through many of the beautiful rooms in her castle.
->
-> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
-"""
+        block = """> Dorothy followed her through many of the beautiful rooms in her castle.
+> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood."""
         result = block_to_html_node(block_type, block).to_html()
-        expected = "<blockquote>Dorothy followed her through many of the beautiful rooms in her castle.\n\nThe Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.</blockquote>"
+        expected = "<blockquote>Dorothy followed her through many of the beautiful rooms in her castle. The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.</blockquote>"
         self.assertEqual(result, expected)
 
     ###### Tests fonctions utlititaires
@@ -123,13 +119,10 @@ the **same** even with inline stuff
     ############ Quote
 
     def test_quote_to_html(self):
-        block = """
-> Dorothy followed her through many of the beautiful rooms in her castle.
->
-> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
-"""
+        block = """> Dorothy followed her through many of the beautiful rooms in her castle.
+> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood."""
         result = quote_to_html(block).to_html()
-        expected = "<blockquote>Dorothy followed her through many of the beautiful rooms in her castle.\n\nThe Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.</blockquote>"
+        expected = "<blockquote>Dorothy followed her through many of the beautiful rooms in her castle. The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.</blockquote>"
         self.assertEqual(result, expected)
 
     ############ Unordered list
@@ -193,4 +186,43 @@ the **same** even with inline stuff
 """
         result = markdown_to_html_node(md).to_html()
         expected = "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>"
+        self.assertEqual(result, expected)
+
+    def test_markdown_to_html_node_blockquote(self):
+        md = """
+> This is a
+> blockquote block
+
+this is paragraph text
+
+"""
+        result = markdown_to_html_node(md).to_html()
+        expected = "<div><blockquote>This is a blockquote block</blockquote><p>this is paragraph text</p></div>"
+        self.assertEqual(result, expected)
+
+    def test_markdown_to_html_node_headings(self):
+        md = """
+# this is an h1
+
+this is paragraph text
+
+## this is an h2
+"""
+        result = markdown_to_html_node(md).to_html()
+        expected = "<div><h1>this is an h1</h1><p>this is paragraph text</p><h2>this is an h2</h2></div>"
+        self.assertEqual(result, expected)
+
+    def test_markdown_to_html_node_lists(self):
+        md = """
+- This is a list
+- with items
+- and _more_ items
+
+1. This is an `ordered` list
+2. with items
+3. and more items
+
+"""
+        result = markdown_to_html_node(md).to_html()
+        expected = "<div><ul><li>This is a list</li><li>with items</li><li>and <i>more</i> items</li></ul><ol><li>This is an <code>ordered</code> list</li><li>with items</li><li>and more items</li></ol></div>"
         self.assertEqual(result, expected)

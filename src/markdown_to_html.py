@@ -75,11 +75,15 @@ def code_to_html(block):
 
 
 def quote_to_html(block):
-    quote_text = block.strip().replace("> ", "").replace(">", "")
-    children_nodes = text_to_children(quote_text)
-
-    parent = ParentNode("blockquote", children=children_nodes)
-
+    lines = block.split("\n")
+    new_lines = []
+    for line in lines:
+        if not line.startswith(">"):
+            raise ValueError("invalid quote block")
+        new_lines.append(line.lstrip(">").strip())
+    content = " ".join(new_lines)
+    children = text_to_children(content)
+    parent = ParentNode("blockquote", children)
     return parent
 
 
