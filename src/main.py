@@ -16,12 +16,13 @@ def main():
 
     content_path = Path("./content")
     destination_path = Path("./public")
-    for file in content_path.glob("**/*.md"):
-        from_path = file
-        template_path = "template.html"
-        dest_path = destination_path / file.relative_to(content_path)
-        generate_page(from_path, template_path, dest_path)
-        dest_path.rename(dest_path.with_suffix(".html"))
+    template_path = Path("template.html")
+
+    for file in content_path.rglob("*.md"):
+        dest_path = (destination_path / file.relative_to(content_path)).with_suffix(
+            ".html"
+        )
+        generate_page(file, template_path, dest_path)
 
 
 def del_dir(paths):
