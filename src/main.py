@@ -1,11 +1,45 @@
-from textnode import TextNode, TextType
+from pathlib import Path
+import shutil
 
 
 def main():
-    dummy_text_node = TextNode(
-        "This is some anchor text", TextType.LINK, "https://www.boot.dev"
-    )
-    print(dummy_text_node)
+    dest = Path("./public")
+    del_dir(list(dest.iterdir()))
+
+    src = Path("./static")
+    for dir in list(src.iterdir()):
+        copy_dir(dir, src, dest)
+    for item in src.glob("**/*"):
+        copy_file(item, src, dest)
+
+
+def del_dir(paths):
+    for path in paths:
+        if path.is_file():
+            path.unlink()
+        elif path.is_dir():
+            del_dir(list(path.iterdir()))
+            path.rmdir()
+
+
+def copy_dir(path, src, dest):
+    if path.is_file():
+        return
+    if path.is_dir():
+        new_dir = dest / path.relative_to(src)
+        if not new_dir.exists():
+            new_dir.mkdir()
+        for child_path in list(path.iterdir()):
+            copy_dir(child_path, src, dest)
+    return
+
+
+def copy_file(path, src, dest):
+    if path.is_dir():
+        return
+    if path.is_file():
+        new_dest = dest / path.relative_to(src)
+        shutil.copy(path, new_dest)
 
 
 if __name__ == "__main__":
