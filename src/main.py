@@ -1,6 +1,8 @@
 from pathlib import Path
 import shutil
 
+from generate_content_html import generate_page
+
 
 def main():
     dest = Path("./public")
@@ -11,6 +13,16 @@ def main():
         copy_dir(dir, src, dest)
     for item in src.glob("**/*"):
         copy_file(item, src, dest)
+
+    content_path = Path("./content")
+    destination_path = Path("./public")
+    print(content_path)
+    for file in content_path.glob("**/*.md"):
+        from_path = file
+        template_path = "template.html"
+        dest_path = destination_path / file.relative_to(content_path)
+        generate_page(from_path, template_path, dest_path)
+        dest_path.rename(dest_path.with_suffix(".html"))
 
 
 def del_dir(paths):
