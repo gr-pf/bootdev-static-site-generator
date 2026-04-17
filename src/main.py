@@ -16,7 +16,6 @@ def main():
 
     content_path = Path("./content")
     destination_path = Path("./public")
-    print(content_path)
     for file in content_path.glob("**/*.md"):
         from_path = file
         template_path = "template.html"
