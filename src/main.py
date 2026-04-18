@@ -1,58 +1,33 @@
-from pathlib import Path
+import os
 import shutil
+import sys
 
-from generate_content_html import generate_page
+from copystatic import copy_files_recursive
+from gencontent import generate_pages_recursive
+
+
+dir_path_static = "./static"
+dir_path_public = "./public"
+dir_path_docs = "./docs"
+dir_path_content = "./content"
+template_path = "./template.html"
 
 
 def main():
-    dest = Path("./public")
-    del_dir(list(dest.iterdir()))
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+    else:
+        basepath = "/"
 
-    src = Path("./static")
-    for dir in list(src.iterdir()):
-        copy_dir(dir, src, dest)
-    for item in src.glob("**/*"):
-        copy_file(item, src, dest)
+    print("Deleting public directory...")
+    if os.path.exists(dir_path_docs):
+        shutil.rmtree(dir_path_docs)
 
-    content_path = Path("./content")
-    destination_path = Path("./public")
-    template_path = Path("template.html")
+    print("Copying static files to public directory...")
+    copy_files_recursive(dir_path_static, dir_path_docs)
 
-    for file in content_path.rglob("*.md"):
-        dest_path = (destination_path / file.relative_to(content_path)).with_suffix(
-            ".html"
-        )
-        generate_page(file, template_path, dest_path)
+    print("Generating content...")
+    generate_pages_recursive(dir_path_content, template_path, dir_path_docs, basepath)
 
 
-def del_dir(paths):
-    for path in paths:
-        if path.is_file():
-            path.unlink()
-        elif path.is_dir():
-            del_dir(list(path.iterdir()))
-            path.rmdir()
-
-
-def copy_dir(path, src, dest):
-    if path.is_file():
-        return
-    if path.is_dir():
-        new_dir = dest / path.relative_to(src)
-        if not new_dir.exists():
-            new_dir.mkdir()
-        for child_path in list(path.iterdir()):
-            copy_dir(child_path, src, dest)
-    return
-
-
-def copy_file(path, src, dest):
-    if path.is_dir():
-        return
-    if path.is_file():
-        new_dest = dest / path.relative_to(src)
-        shutil.copy(path, new_dest)
-
-
-if __name__ == "__main__":
-    main()
+main()
